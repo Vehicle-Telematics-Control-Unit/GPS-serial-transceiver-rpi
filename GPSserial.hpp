@@ -1,7 +1,3 @@
-#include <atomic>
-#include <memory>
-#include <string>
-
 //! \brief GPSserial class blueprint
 class GPSserial{
 
@@ -25,7 +21,8 @@ public:
     int32_t initSerialInterface();
 
     //! \brief receive incoming data from serialport
-    int32_t receiveGPSdata(std::pair<std::string, std::mutex>&gpsData);
+    //! \param gpsDataStr incoming GPS GPGGA data is inserted into it
+    int32_t receiveGPSdata(std::string& gpsDataStr);
 
     enum BaudRate{
         BR_50= 0000001,

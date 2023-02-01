@@ -1,24 +1,29 @@
 #include <iostream>
-#include <mutex>
-#include <utility>
+#include <thread>
+#include <chrono>
 #include "GPSserial.hpp"
 
 int main()
 {
-    std::cout << "heyyy";
-    GPSserial gps("/dev/ttyACM1", GPSserial::BR_9600);
+    setbuf(stdout, NULL);
+    GPSserial gps("/dev/gps_ser", GPSserial::BR_9600);
 
-    if(gps.initSerialInterface() < 0)
-        return -1;
-
-    std::pair<std::string, std::mutex> gpsData;
-    gpsData.first = "";
-    while(1)
+    std::string gpsData;
+    int counter = 0;
+    while(true)
     {
-        gps.receiveGPSdata(gpsData);
-        gpsData.second.lock();
-        std::cout << gpsData.first;
-        gpsData.second.unlock();
+        // if failed to init retry
+        if(gps.initSerialInterface() < 0)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::cout << "retrying to get GPS data!\n";
+            continue;
+        }
+
+        while(gps.receiveGPSdata(gpsData) == 0)
+        {
+            std::cout << (counter = (counter+1) % 9999) << "-->" << gpsData << '\n';
+        }
     }
     return 0;
 }

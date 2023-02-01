@@ -5,11 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <termios.h>
-#include <mutex>
-#include <utility>
+#include <iostream>
 #include "GPSserial.hpp"
 
-#include<iostream>
 
 GPSserial::GPSserial(std::string portName, uint32_t baudRate=BR_9600) : portName_m(portName),baudRate_m(baudRate)
 {
@@ -22,10 +20,9 @@ int32_t GPSserial::openCharDeviceFile()
     fileDescriptor_m = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
     if (fileDescriptor_m < 0)
     {
-        printf("Error opening %s: %s\n", portname, strerror(errno));
+        std::cout << "Error opening " <<  portname << " " << strerror(errno) << '\n';
         return -1;
     }
-
 
     return 0;
 }
@@ -36,7 +33,7 @@ int32_t GPSserial::initCommunicationAttributes()
 
     if (tcgetattr(fileDescriptor_m, &tty) < 0)
     {
-        printf("Error from tcgetattr: %s\n", strerror(errno));
+        std::cout << "Error from tcgetattr: " <<  strerror(errno) << '\n';
         return -1;
     }
     cfsetospeed(&tty, (speed_t)baudRate_m);
@@ -60,7 +57,7 @@ int32_t GPSserial::initCommunicationAttributes()
 
     if (tcsetattr(fileDescriptor_m, TCSANOW, &tty) != 0)
     {
-        printf("Error from tcsetattr: %s\n", strerror(errno));
+        std::cout << "Error from tcsetattr: " << strerror(errno) << '\n';
         return -1;
     }
     return 0;
@@ -78,30 +75,31 @@ int32_t GPSserial::initSerialInterface()
     return 0;
 }
 
-int32_t GPSserial::receiveGPSdata(std::pair<std::string, std::mutex>& gpsData)
+int32_t GPSserial::receiveGPSdata(std::string& gpsDataStr)
 {
     tcdrain(fileDescriptor_m);
 
-    char buf[80];
-    uint32_t rdlen;
+    char readBuffer[300];
+    uint32_t readLineSize;
 
-    rdlen = read(fileDescriptor_m, buf, sizeof(buf) - 1);
-    std::cout << "hey";
-    if (rdlen > 0)
+    while(true)
     {
-        buf[rdlen] = 0;
-        gpsData.second.lock();
-        gpsData.first = "hello";
-        gpsData.second.unlock();
-    }
-    else if (rdlen < 0)
-    {
-        printf("Error from read: %d: %s\n", rdlen, strerror(errno));
-        return -1;
-    }
-    else
-    {
-        printf("Timeout from read\n");
+        readLineSize = read(fileDescriptor_m, readBuffer, sizeof(readBuffer) - 1);
+        char* start = strstr(readBuffer, "GPGGA");
+        char* end = strstr(readBuffer, "\n");
+        if(start - readBuffer == 1 && end - readBuffer > 0)
+        {
+            char temp[300];
+            strncpy(temp, start, end - start);
+            temp[end-start-1] = '\0';
+            gpsDataStr = temp;
+            break;
+        }
+        else if (readLineSize < 0)
+        {
+            std::cout << "Error from read: " << readLineSize << " " << strerror(errno) << '\n';
+            return -1;
+        }
     }
 
     return 0;
