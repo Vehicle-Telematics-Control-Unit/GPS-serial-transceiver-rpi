@@ -87,6 +87,7 @@ int32_t GPSserial::receiveGPSdata(std::string& gpsDataStr)
         readLineSize = read(fileDescriptor_m, readBuffer, sizeof(readBuffer) - 1);
         char* start = strstr(readBuffer, "GPGGA");
         char* end = strstr(readBuffer, "\n");
+        std::cout << "===>" << readLineSize << "\n";
         if(start - readBuffer == 1 && end - readBuffer > 0)
         {
             char temp[300];
@@ -95,7 +96,7 @@ int32_t GPSserial::receiveGPSdata(std::string& gpsDataStr)
             gpsDataStr = temp;
             break;
         }
-        else if (readLineSize < 0)
+        else if (readLineSize <= 0)
         {
             std::cout << "Error from read: " << readLineSize << " " << strerror(errno) << '\n';
             return -1;
