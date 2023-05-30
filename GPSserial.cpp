@@ -83,19 +83,24 @@ void GPSserial::receiveGPSdata()
     char data[1];
     while(read(fileDescriptor_m, &data[0],sizeof(char)) != -1)
     {
-        // if(data[0] == '\n')
-        //     std::cout << "\n>>>>>>>>>>>>>>lol<<<<<<<<<<";
-        // std::cout << data[0];
         std::cout << std::fixed << std::setprecision(10);
         if (gps.encode(data[0])) 
         {
             if (gps.location.isValid()) 
             {
-                std::cout << "Latitude: ";
+                std::cout << "Latitude, Long: ";
                 std::cout << gps.location.lat(); // Prints latitude with 6 decimal places
-
-                std::cout << "Longitude: ";
+                std::cout << ", ";
                 std::cout << gps.location.lng(); // Prints longitude with 6 decimal places
+                std::cout << " ; Time: ";
+                std::cout << gps.time.getTime();
+                // std::cout << (int)gps.time.hour();
+                // std::cout << ":";
+                // std::cout << (int)gps.time.minute();
+                // std::cout << ":";
+                // std::cout << (int)gps.time.second();
+                // std::cout << ".";
+                // std::cout << (int)gps.time.centisecond();
                 std::cout << "\n\n\n";
             }
         }

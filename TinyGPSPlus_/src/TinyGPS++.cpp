@@ -446,6 +446,12 @@ uint8_t TinyGPSTime::centisecond()
    return time % 100;
 }
 
+uint32_t TinyGPSTime::getTime()
+{
+  return time;
+}
+
+
 void TinyGPSDecimal::commit()
 {
    val = newval;
