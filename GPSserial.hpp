@@ -7,8 +7,8 @@ private:
     int32_t fileDescriptor_m;
 
 
-    int32_t openCharDeviceFile();
-    int32_t initCommunicationAttributes();
+    bool openCharDeviceFile();
+    bool initCommunicationAttributes();
 
 public:
     //! \brief Contructor
@@ -18,11 +18,11 @@ public:
 
     //! \brief opens the character device file
     //!        and initializes the serial communication
-    int32_t initSerialInterface();
+    bool initSerialInterface();
 
     //! \brief receive incoming data from serialport
     //! \param gpsDataStr incoming GPS GPGGA data is inserted into it
-    int32_t receiveGPSdata(std::string& gpsDataStr);
+    void receiveGPSdata();
 
     enum BaudRate{
         BR_50= 0000001,

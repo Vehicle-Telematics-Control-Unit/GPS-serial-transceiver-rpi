@@ -7,34 +7,35 @@
 #include <termios.h>
 #include <iostream>
 #include "GPSserial.hpp"
+#include "TinyGPSPlus/src/TinyGPS++.h"
 
 
 GPSserial::GPSserial(std::string portName, uint32_t baudRate=BR_9600) : portName_m(portName),baudRate_m(baudRate)
 {
 }
 
-int32_t GPSserial::openCharDeviceFile()
+bool GPSserial::openCharDeviceFile()
 {
     const char *portname = portName_m.c_str();
 
-    fileDescriptor_m = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
+    fileDescriptor_m = open(portname, O_RDONLY | O_NOCTTY);
     if (fileDescriptor_m < 0)
     {
         std::cout << "Error opening " <<  portname << " " << strerror(errno) << '\n';
-        return -1;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
-int32_t GPSserial::initCommunicationAttributes()
+bool GPSserial::initCommunicationAttributes()
 {
     struct termios tty;
 
     if (tcgetattr(fileDescriptor_m, &tty) < 0)
     {
         std::cout << "Error from tcgetattr: " <<  strerror(errno) << '\n';
-        return -1;
+        return false;
     }
     cfsetospeed(&tty, (speed_t)baudRate_m);
     cfsetispeed(&tty, (speed_t)baudRate_m);
@@ -58,49 +59,42 @@ int32_t GPSserial::initCommunicationAttributes()
     if (tcsetattr(fileDescriptor_m, TCSANOW, &tty) != 0)
     {
         std::cout << "Error from tcsetattr: " << strerror(errno) << '\n';
-        return -1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
-int32_t GPSserial::initSerialInterface()
+bool GPSserial::initSerialInterface()
 {
 
     if(openCharDeviceFile() < 0)
-        return -1;
+        return false;
 
     if(initCommunicationAttributes() < 0)
-        return -1;
+        return false;
 
-    return 0;
+    return true;
 }
 
-int32_t GPSserial::receiveGPSdata(std::string& gpsDataStr)
+void GPSserial::receiveGPSdata()
 {
-    tcdrain(fileDescriptor_m);
-
-    char readBuffer[300];
-    uint32_t readLineSize;
-
-    while(true)
+    static TinyGPSPlus gps;
+    char data[1];
+    while(read(fileDescriptor_m, &data[0],sizeof(char)) != -1)
     {
-        readLineSize = read(fileDescriptor_m, readBuffer, sizeof(readBuffer) - 1);
-        char* start = strstr(readBuffer, "GPGGA");
-        char* end = strstr(readBuffer, "\n");
-        if(start - readBuffer == 1 && end - readBuffer > 0)
+        // if(data[0] == '\n')
+        //     std::cout << "\n>>>>>>>>>>>>>>lol<<<<<<<<<<";
+        // std::cout << data[0];
+        if (gps.encode(data[0])) 
         {
-            char temp[300];
-            strncpy(temp, start, end - start);
-            temp[end-start-1] = '\0';
-            gpsDataStr = temp;
-            break;
-        }
-        else if (readLineSize <= 0)
-        {
-            std::cout << "Error from read: " << readLineSize << " " << strerror(errno) << '\n';
-            return -1;
+            if (gps.location.isValid()) 
+            {
+                std::cout << "Latitude: ";
+                std::cout << gps.location.lat(), 6; // Prints latitude with 6 decimal places
+
+                std::cout << "Longitude: ";
+                std::cout << gps.location.lng(), 6; // Prints longitude with 6 decimal places
+            }
         }
     }
-
-    return 0;
 }

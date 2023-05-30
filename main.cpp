@@ -5,25 +5,23 @@
 
 int main()
 {
+    setbuf(stdin, NULL);
     setbuf(stdout, NULL);
-    GPSserial gps("/dev/gps_ser", GPSserial::BR_9600);
+    GPSserial gps("/dev/ttyACM0", GPSserial::BR_9600);
 
     std::string gpsData;
     int counter = 0;
     while(true)
     {
         // if failed to init retry
-        if(gps.initSerialInterface() < 0)
+        if(!gps.initSerialInterface())
         {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::this_thread::sleep_for(std::chrono::seconds(1));
             std::cout << "retrying to get GPS data!\n";
             continue;
         }
 
-        while(gps.receiveGPSdata(gpsData) == 0)
-        {
-            std::cout << (counter = (counter+1) % 9999) << "-->" << gpsData << '\n';
-        }
+        gps.receiveGPSdata();
     }
     return 0;
 }
