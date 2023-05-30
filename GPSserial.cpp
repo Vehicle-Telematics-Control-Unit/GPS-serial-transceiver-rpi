@@ -6,8 +6,9 @@
 #include <unistd.h>
 #include <termios.h>
 #include <iostream>
+#include <iomanip>
 #include "GPSserial.hpp"
-#include "TinyGPSPlus/src/TinyGPS++.h"
+#include "TinyGPSPlus_/src/TinyGPS++.h"
 
 
 GPSserial::GPSserial(std::string portName, uint32_t baudRate=BR_9600) : portName_m(portName),baudRate_m(baudRate)
@@ -85,15 +86,17 @@ void GPSserial::receiveGPSdata()
         // if(data[0] == '\n')
         //     std::cout << "\n>>>>>>>>>>>>>>lol<<<<<<<<<<";
         // std::cout << data[0];
+        std::cout << std::fixed << std::setprecision(10);
         if (gps.encode(data[0])) 
         {
             if (gps.location.isValid()) 
             {
                 std::cout << "Latitude: ";
-                std::cout << gps.location.lat(), 6; // Prints latitude with 6 decimal places
+                std::cout << gps.location.lat(); // Prints latitude with 6 decimal places
 
                 std::cout << "Longitude: ";
-                std::cout << gps.location.lng(), 6; // Prints longitude with 6 decimal places
+                std::cout << gps.location.lng(); // Prints longitude with 6 decimal places
+                std::cout << "\n\n\n";
             }
         }
     }

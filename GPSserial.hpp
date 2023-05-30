@@ -1,3 +1,6 @@
+#ifndef GPS_SERIAL_HPP_
+#define GPS_SERIAL_HPP_
+
 //! \brief GPSserial class blueprint
 class GPSserial{
 
@@ -42,3 +45,6 @@ public:
         BR_38400= 0000017
     };
 };
+
+
+#endif // GPS_SERIAL_HPP_

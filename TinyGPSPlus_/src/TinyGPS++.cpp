@@ -21,13 +21,20 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "TinyGPS++.h"
 
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <iostream>
 #include <cmath>
+#include "TinyGPS++.h"
+
+extern unsigned long long mils()
+{
+  auto currentTime = std::chrono::system_clock::now().time_since_epoch();
+  unsigned long long milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime).count();
+  return milliseconds;
+}
 
 #define _GPRMCterm   "GPRMC"
 #define _GPGGAterm   "GPGGA"

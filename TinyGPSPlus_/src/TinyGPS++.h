@@ -29,13 +29,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <chrono>
 #include <cmath>
 
-unsigned long long mils() 
-{
-  auto currentTime = std::chrono::system_clock::now().time_since_epoch();
-  unsigned long long milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime).count();
-  return milliseconds;
-}
-
 #define PI 3.1415926535897932384626433832795
 #define HALF_PI 1.5707963267948966192313216916398
 #define TWO_PI 6.283185307179586476925286766559
@@ -69,6 +62,10 @@ unsigned long long mils()
 #define _GPS_KM_PER_METER 0.001
 #define _GPS_FEET_PER_METER 3.2808399
 #define _GPS_MAX_FIELD_SIZE 15
+
+
+extern unsigned long long mils();
+
 
 struct RawDegrees
 {
