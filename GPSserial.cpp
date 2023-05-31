@@ -10,8 +10,7 @@
 #include "GPSserial.hpp"
 #include "TinyGPSPlus_/src/TinyGPS++.h"
 
-
-GPSserial::GPSserial(std::string portName, uint32_t baudRate=BR_9600) : portName_m(portName),baudRate_m(baudRate)
+GPSserial::GPSserial(std::string portName, uint32_t baudRate = BR_9600) : portName_m(portName), baudRate_m(baudRate)
 {
 }
 
@@ -22,10 +21,22 @@ bool GPSserial::openCharDeviceFile()
     fileDescriptor_m = open(portname, O_RDONLY | O_NOCTTY);
     if (fileDescriptor_m < 0)
     {
-        std::cout << "Error opening " <<  portname << " " << strerror(errno) << '\n';
+        std::cout << "Error opening " << portname << " " << strerror(errno) << '\n';
         return false;
     }
 
+    return true;
+}
+
+bool GPSserial::exec(std::string command)
+{
+    FILE *pipe = popen(command.c_str(), "r");
+    if (!pipe)
+    {
+        return false;
+    }
+
+    pclose(pipe);
     return true;
 }
 
@@ -35,7 +46,7 @@ bool GPSserial::initCommunicationAttributes()
 
     if (tcgetattr(fileDescriptor_m, &tty) < 0)
     {
-        std::cout << "Error from tcgetattr: " <<  strerror(errno) << '\n';
+        std::cout << "Error from tcgetattr: " << strerror(errno) << '\n';
         return false;
     }
     cfsetospeed(&tty, (speed_t)baudRate_m);
@@ -68,10 +79,10 @@ bool GPSserial::initCommunicationAttributes()
 bool GPSserial::initSerialInterface()
 {
 
-    if(openCharDeviceFile() < 0)
+    if (openCharDeviceFile() < 0)
         return false;
 
-    if(initCommunicationAttributes() < 0)
+    if (initCommunicationAttributes() < 0)
         return false;
 
     return true;
@@ -81,19 +92,32 @@ void GPSserial::receiveGPSdata()
 {
     static TinyGPSPlus gps;
     char data[1];
-    while(read(fileDescriptor_m, &data[0],sizeof(char)) != -1)
+    while (read(fileDescriptor_m, &data[0], sizeof(char)) != -1)
     {
         std::cout << std::fixed << std::setprecision(10);
-        if (gps.encode(data[0])) 
+        if (gps.encode(data[0]))
         {
-            if (gps.location.isValid()) 
+            if (gps.location.isValid())
             {
                 std::cout << "Latitude, Long: ";
                 std::cout << gps.location.lat(); // Prints latitude with 6 decimal places
                 std::cout << ", ";
-                std::cout << gps.location.lng(); // Prints longitude with 6 decimal places
-                std::cout << " ; Time: ";
-                std::cout << gps.time.getTime();
+                std::cout << gps.location.lng() << "\n\n"; // Prints longitude with 6 decimal places
+                // std::cout << " ; Time: ";
+                // std::cout << gps.time.getTime();
+
+                // fetching the time
+                std::time_t systemTime = std::time(nullptr);
+                std::tm *localTime = std::localtime(&systemTime);
+                if (!(localTime->tm_hour == gps.time.hour() && localTime->tm_min == gps.time.minute() && localTime->tm_sec == gps.time.second()))
+                {
+                    // updating the time with gps timing
+                    localTime->tm_hour = gps.time.hour();
+                    localTime->tm_min = gps.time.minute();
+                    localTime->tm_sec = gps.time.second();
+                    std::time_t newSystemTime = std::mktime(localTime);
+                    exec("sudo date -s @" + std::string(std::to_string(newSystemTime)));
+                }
                 // std::cout << (int)gps.time.hour();
                 // std::cout << ":";
                 // std::cout << (int)gps.time.minute();
@@ -101,7 +125,7 @@ void GPSserial::receiveGPSdata()
                 // std::cout << (int)gps.time.second();
                 // std::cout << ".";
                 // std::cout << (int)gps.time.centisecond();
-                std::cout << "\n\n\n";
+                // std::cout << "\n\n\n";
             }
         }
     }
