@@ -12,7 +12,7 @@ private:
 
     bool openCharDeviceFile();
     bool initCommunicationAttributes();
-    bool exec(std::string command);
+    static bool exec(std::string command);
 
 public:
     //! \brief Contructor
