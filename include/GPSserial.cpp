@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include "GPSserial.hpp"
-#include "TinyGPSPlus_/src/TinyGPS++.h"
+#include <TinyGPS++.h>
 
 GPSserial::GPSserial(std::string portName, uint32_t baudRate = BR_9600) : portName_m(portName), baudRate_m(baudRate)
 {
@@ -116,7 +116,7 @@ void GPSserial::receiveGPSdata()
                     localTime->tm_min = gps.time.minute();
                     localTime->tm_sec = gps.time.second();
                     std::time_t newSystemTime = std::mktime(localTime);
-                    exec("sudo date -s @" + std::string(std::to_string(newSystemTime)));
+                    exec("date -s @" + std::string(std::to_string(newSystemTime)));
                 }
                 // std::cout << (int)gps.time.hour();
                 // std::cout << ":";
