@@ -107,16 +107,16 @@ void GPSserial::receiveGPSdata()
                 std::cout << ", ";
                 std::cout << gps.location.lng() << "\n\n"; // Prints longitude with 6 decimal places
 
-                // using json = nlohmann::json;
-                // json jsonMessage = {
-                //     {"lat", ""},
-                //     {"lng", ""},
-                // };
+                using json = nlohmann::json;
+                json jsonMessage = {
+                    {"lat", ""},
+                    {"lng", ""},
+                };
 
-                // jsonMessage["lat"] = gps.location.lat();
-                // jsonMessage["lng"] = gps.location.lng();
-                // std::string message = jsonMessage.dump(2);
-                // serviceManager_m->updateEvent(GPS_EVENT_ID, std::vector<uint8_t>(message.begin(), message.end()));
+                jsonMessage["lat"] = gps.location.lat();
+                jsonMessage["lng"] = gps.location.lng();
+                std::string message = jsonMessage.dump(2);
+                serviceManager_m->updateEvent(GPS_EVENT_ID, std::vector<uint8_t>(message.begin(), message.end()));
                 // std::cout << " ; Time: ";
                 // std::cout << gps.time.getTime();
 
