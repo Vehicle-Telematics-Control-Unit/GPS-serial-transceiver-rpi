@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -shared -Wl,-soname,libTinyGPS.so -o libTinyGPS.so CMakeFiles/TinyGPS.dir/src/TinyGPS++.cpp.o 
