@@ -1,8 +1,8 @@
 FROM vsomeip_build:v0 as builder
 
-COPY src src
+COPY src_build src_build
 
-RUN cd src; \
+RUN cd src_build; \
     rm -rf build; \
     mkdir build; \
     cd build; \
@@ -10,7 +10,7 @@ RUN cd src; \
     make
 
 FROM alpine:3.17.2
-COPY --from=builder /src/build /src/build
+COPY --from=builder /src_build/build /src_build/build
 COPY --from=builder /usr/local/lib/libvsomeip3.so.3 /usr/local/lib
 COPY --from=builder /usr/local/lib/libvsomeip3-cfg.so.3 /usr/local/lib
 COPY --from=builder /usr/local/lib/libvsomeip3-sd.so.3 /usr/local/lib
