@@ -1,6 +1,8 @@
 #ifndef GPS_SERIAL_HPP_
 #define GPS_SERIAL_HPP_
 
+#include <ServiceManagerAdapter.hpp>
+
 //! \brief GPSserial class blueprint
 class GPSserial
 {
@@ -9,16 +11,17 @@ private:
     std::string portName_m;
     uint32_t baudRate_m;
     int32_t fileDescriptor_m;
+    std::shared_ptr<ServiceManagerAdapter> serviceManager_m;
 
     bool openCharDeviceFile();
     bool initCommunicationAttributes();
-    bool exec(std::string command);
+    static bool exec(std::string command);
 
 public:
     //! \brief Contructor
     //! \param portName the tty port used ex: "/dev/ttyACM0"
     //! \param baudRate UART baud rate ex: BR_9600
-    GPSserial(std::string portName, uint32_t baudRate);
+    GPSserial(std::string portName, uint32_t baudRate, std::shared_ptr<ServiceManagerAdapter> serviceManager);
 
     //! \brief opens the character device file
     //!        and initializes the serial communication

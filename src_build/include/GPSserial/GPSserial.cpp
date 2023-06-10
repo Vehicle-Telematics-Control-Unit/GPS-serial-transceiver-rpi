@@ -1,3 +1,5 @@
+#include <json.hpp>
+#include "GPSserial.hpp"
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -7,10 +9,11 @@
 #include <termios.h>
 #include <iostream>
 #include <iomanip>
-#include "GPSserial.hpp"
+#include <memory>
 #include <TinyGPS++.h>
+#include <conf.hpp>
 
-GPSserial::GPSserial(std::string portName, uint32_t baudRate = BR_9600) : portName_m(portName), baudRate_m(baudRate)
+GPSserial::GPSserial(std::string portName, uint32_t baudRate, std::shared_ptr<ServiceManagerAdapter> serviceManager) : portName_m(portName), baudRate_m(baudRate), serviceManager_m(serviceManager)
 {
 }
 
@@ -103,6 +106,17 @@ void GPSserial::receiveGPSdata()
                 std::cout << gps.location.lat(); // Prints latitude with 6 decimal places
                 std::cout << ", ";
                 std::cout << gps.location.lng() << "\n\n"; // Prints longitude with 6 decimal places
+
+                using json = nlohmann::json;
+                json jsonMessage = {
+                    {"lat", ""},
+                    {"lng", ""},
+                };
+
+                jsonMessage["lat"] = gps.location.lat();
+                jsonMessage["lng"] = gps.location.lng();
+                std::string message = jsonMessage.dump(2);
+                serviceManager_m->updateEvent(GPS_EVENT_ID, std::vector<uint8_t>(message.begin(), message.end()));
                 // std::cout << " ; Time: ";
                 // std::cout << gps.time.getTime();
 
