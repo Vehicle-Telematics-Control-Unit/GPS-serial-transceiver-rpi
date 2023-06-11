@@ -2,7 +2,7 @@
 #include <thread>
 #include <chrono>
 #include <GPSserial.hpp>
-#include <conf.hpp>
+#include "conf.hpp"
 #include <ServiceManagerAdapter.hpp>
 
 int main()
