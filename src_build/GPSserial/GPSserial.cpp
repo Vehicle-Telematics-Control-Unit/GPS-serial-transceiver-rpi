@@ -109,16 +109,14 @@ void GPSserial::receiveGPSdata()
 
                 using json = nlohmann::json;
                 json jsonMessage = {
-                    {"lat", ""},
-                    {"lng", ""},
+                    {"lat", (double)0.0},
+                    {"lng", (double)0.0},
                 };
 
                 jsonMessage["lat"] = gps.location.lat();
                 jsonMessage["lng"] = gps.location.lng();
                 std::string message = jsonMessage.dump(2);
                 serviceManager_m->updateEvent(GPS_EVENT_ID, std::vector<uint8_t>(message.begin(), message.end()));
-                // std::cout << " ; Time: ";
-                // std::cout << gps.time.getTime();
 
                 // fetching the time
                 std::time_t systemTime = std::time(nullptr);
@@ -132,14 +130,8 @@ void GPSserial::receiveGPSdata()
                     std::time_t newSystemTime = std::mktime(localTime);
                     exec("date -s @" + std::string(std::to_string(newSystemTime)));
                 }
-                // std::cout << (int)gps.time.hour();
-                // std::cout << ":";
-                // std::cout << (int)gps.time.minute();
-                // std::cout << ":";
-                // std::cout << (int)gps.time.second();
-                // std::cout << ".";
-                // std::cout << (int)gps.time.centisecond();
-                // std::cout << "\n\n\n";
+
+                std::cout << message;
             }
         }
     }

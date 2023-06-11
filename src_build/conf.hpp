@@ -3,12 +3,9 @@
 
 #define SERVICE_ID 0x1242
 #define INSTANCE_ID 0x5675
-// #define REQUEST_SERVICE_ID 0x1234
-// #define REQUEST_INSTANCE_ID 0x5678
-// #define REQUEST_METHOD_ID 0x0421
 #define EVENTGROUP_ID 0x9C40
 #define GPS_EVENT_ID 0x9C47
-// #define HEADING_EVENT_ID 0x9C44
+
 #define PORT 5001
 
 #endif
