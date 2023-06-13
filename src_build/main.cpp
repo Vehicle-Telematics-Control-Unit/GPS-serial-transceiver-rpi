@@ -25,6 +25,9 @@ int main()
 
     std::string gpsData;
     int counter = 0;
+    std::thread vsomeipThread([&]{
+        vsomeService_shared->start();
+    });
     while (true)
     {
         // if failed to init retry
