@@ -4,7 +4,7 @@ GPS serial transceiver for the raspberry pi
 
 # How to run it
 ```bash
-$ docker run -it --privileged --net host -v /tmp:/tmp:z -v /dev/ttyACM0:/dev/ttyACM0 gps-serial-receiver:latest
+$ docker run --name gps_transceiver --rm --privileged --net host -v /tmp:/tmp:z -v /dev/ttyACM0:/dev/ttyACM0 gps-serial-receiver
 ```
 
 # bird-view
