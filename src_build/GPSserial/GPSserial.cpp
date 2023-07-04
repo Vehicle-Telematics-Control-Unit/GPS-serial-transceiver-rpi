@@ -21,12 +21,13 @@ bool GPSserial::openCharDeviceFile()
 {
     const char *portname = portName_m.c_str();
 
-    fileDescriptor_m = open(portname, O_RDONLY | O_NOCTTY);
+    fileDescriptor_m = open(portname, O_RDWR);
     if (fileDescriptor_m < 0)
     {
         std::cout << "Error opening " << portname << " " << strerror(errno) << '\n';
         return false;
     }
+
 
     return true;
 }
@@ -82,12 +83,11 @@ bool GPSserial::initCommunicationAttributes()
 bool GPSserial::initSerialInterface()
 {
 
-    if (openCharDeviceFile() < 0)
+    if (!openCharDeviceFile() || !initCommunicationAttributes())
+    {
+        close(fileDescriptor_m);
         return false;
-
-    if (initCommunicationAttributes() < 0)
-        return false;
-
+    }
     return true;
 }
 

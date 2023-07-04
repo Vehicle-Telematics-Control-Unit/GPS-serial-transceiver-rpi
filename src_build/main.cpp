@@ -33,7 +33,7 @@ int main()
         // if failed to init retry
         if (!gps.initSerialInterface())
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(2));
             std::cout << "retrying to get GPS data!\n";
             continue;
         }
