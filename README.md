@@ -4,7 +4,14 @@ GPS serial transceiver for the raspberry pi
 
 # How to run it
 ```bash
-$ docker run --name gps_transceiver -it --rm --privileged --net host -v /tmp:/tmp:z -v /dev/ttyACM0:/dev/ttyACM0 gps-serial-receiver
+$ docker run --name gps_transceiver -it --rm --privileged --net host -v /tmp:/tmp:z -v /dev/gps_serial:/dev/gps_serial registry.digitalocean.com/vehicle-plus/tcu_gps-serial-receiver:v0
+```
+
+## build and push to container registry
+```bash
+$ docker buildx build --push \
+--platform linux/amd64,linux/arm64 \
+--tag registry.digitalocean.com/vehicle-plus/tcu_gps-serial-receiver:v0 .
 ```
 
 # bird-view

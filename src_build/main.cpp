@@ -5,8 +5,15 @@
 #include "conf.hpp"
 #include <ServiceManagerAdapter.hpp>
 
-int main()
+int main(int argc, char* argv[]) 
 {
+    std::string gps_path{"/dev/gps_serial"}; 
+    if(argc > 1)
+    {
+        gps_path = argv[1];
+    }
+    std::cout << "GPS position: " << gps_path << '\n' << std::flush;
+
     setbuf(stdin, NULL);
     setbuf(stdout, NULL);
 
@@ -21,7 +28,7 @@ int main()
     vsomeService_shared->addEvent(GPS_EVENT_ID);
     vsomeService_shared->offerEvents();
 
-    GPSserial gps("/dev/ttyACM0", GPSserial::BR_9600, vsomeService_shared);
+    GPSserial gps(gps_path, GPSserial::BR_9600, vsomeService_shared);
 
     std::string gpsData;
     int counter = 0;
